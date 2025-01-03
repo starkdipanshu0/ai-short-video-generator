@@ -9,7 +9,7 @@ function page() {
   
   
   return (
-    <div className='p-10'>
+    <div className='p-10  '>
       <div className='flex mb-6 justify-between'>
         <h2 className='font-extrabold text-3xl text-primary'>Dashboard</h2>
         <Link href={'/dashboard/create-new'}>

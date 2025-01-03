@@ -1,10 +1,21 @@
+"use client"
 import React from 'react'
 import SelectTopic from './_components/SelectTopic'
+import SelectStyle from './_components/SelectStyle'
+import SelectDuration from './_components/SelectDuration';
+import { Button } from '@/components/ui/button';
 
 function CreateNew() {
   
-  const [formData, setFormData] = React.useState('')
-  const handleOnInputChange = (fieldName:Text, fieldVale:Text) => {
+  const [formData, setFormData] = React.useState([]);
+  const handleOnInputChange = (fieldName:string, fieldVale:string) => {
+    setFormData(prev=>({
+      ...prev,
+      [fieldName]: fieldVale
+    })
+    )
+    
+
      
 
   }
@@ -15,10 +26,14 @@ function CreateNew() {
             {/* select topic component */}
             <SelectTopic onUserSelect={handleOnInputChange}/>
             {/* select Style */}
+            <SelectStyle onUserSelect={handleOnInputChange}/>
 
             {/* duration */}
-
+            <SelectDuration onUserSelect={handleOnInputChange}/>
             {/* Create Button */}
+            <Button className="bg-primary text-white px-6 py-3 text-lg w-full font-semibold">
+                Create Short Video
+            </Button>
         </div>
 
 

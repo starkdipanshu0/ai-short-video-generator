@@ -6,7 +6,7 @@ import {
   
 } from '@clerk/nextjs'
 import Provider from "./provider";
-import {Outfit} from "next/font/google"
+import {Outfit, Roboto_Slab} from "next/font/google"
 
 const outfit = Outfit({subsets:['latin']
 });

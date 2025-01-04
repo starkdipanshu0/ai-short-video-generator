@@ -3,11 +3,10 @@ import { CirclePlus } from 'lucide-react'
 import React from 'react'
 import EmptyState from './_components/EmptyState'
 import Link from 'next/link'
+import CustomLoading from './_components/CustomLoading'
 
 function page() {
   const videoList= []
-  
-  
   return (
     <div className='p-10  '>
       <div className='flex mb-6 justify-between'>
@@ -24,6 +23,7 @@ function page() {
           </div>
           
         }
+        
       
     </div>
   )

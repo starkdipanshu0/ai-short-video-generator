@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import SelectTopic from './_components/SelectTopic'
 import SelectStyle from './_components/SelectStyle'
 import SelectDuration from './_components/SelectDuration';
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import axios from 'axios';
 import CustomLoading from './_components/CustomLoading';
 import { v4 as uuidv4 } from 'uuid';
+import { VideoDataContext } from '@/app/_context/VideoDataContext';
 interface VideoSegment {
   contentText: string;
   imagePrompt: string;
@@ -21,6 +22,7 @@ function CreateNew() {
     style: '',
     duration: ''
   });
+  const {videoData, setVideoData} = React.useContext(VideoDataContext);
 
   const [videoScript, setVideoScript] = useState<VideoSegment[]>([]);
   const [audioFileURL, setAudioFileURL] = useState<string>('');
@@ -58,11 +60,15 @@ const getVideoScript = async ()=>{
     console.log(res.data)
     const scriptData: VideoSegment[] = res.data.result.videoSegments;
     setVideoScript(scriptData); 
-    async()=>{
-      await generateAudioFile(scriptData);
-      await generateImage(scriptData);
+    setVideoData((prev:any)=>({
+      ...prev,
+      'videoScript': scriptData
+    }))
+    
+       generateAudioFile(scriptData);
+       generateImage(scriptData);
 
-    }
+    
     
 
   
@@ -74,7 +80,7 @@ const getVideoScript = async ()=>{
 }
   // generate audio file
 const generateAudioFile = async (videoScript:any)=>{
-  
+  setLoading(true);
   let script = ''
   let id =  uuidv4();
   videoScript.forEach((item:any)=>{
@@ -89,14 +95,18 @@ const generateAudioFile = async (videoScript:any)=>{
   ).then(res=>{
     console.log('audio file:',res.data.result)
     setAudioFileURL(res.data.result);
+    setVideoData((prev:any)=>({
+      ...prev,
+      'audioFileUrl': res.data.result
+    }))
     generateAudioCaption(res.data.result);
   })
-  
+  setLoading(false);
   
 }
   // generate audio caption
 const generateAudioCaption = async (audioFileURL:string)=>{
-  
+  setLoading(true);
   await axios.post('/api/generate-caption',
     {
       audioFileURL:audioFileURL
@@ -104,9 +114,13 @@ const generateAudioCaption = async (audioFileURL:string)=>{
   ).then(res=>{
     console.log('audio caption:',res.data.words)
     setAudioCaption(res.data.words);
+    setVideoData((prev:any)=>({
+      ...prev,
+      'captions': res.data.words
+    }))
   })
   
-  
+  setLoading(false);  
 }
 
   // generate image
@@ -135,12 +149,21 @@ const generateAudioCaption = async (audioFileURL:string)=>{
   
       // Update the image list
       setImageList(validImages);
+      setVideoData((prev:any)=>({
+        ...prev,
+        'imageList': validImages
+      }))
       console.log('Generated images:', validImages);
     } catch (error) {
       console.error('Error generating images:', error);
     }
      
   };
+
+
+  useEffect(() => {
+    console.log('videoData:',videoData)
+  }, [videoData]);
 
 
 

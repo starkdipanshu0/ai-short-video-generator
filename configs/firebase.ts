@@ -9,7 +9,7 @@ import { getStorage } from "firebase/storage";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyC4JuKPs7fXKN1MEZprZdVLGUfO6HVjx7o",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: "ai-short-video-generator-3632a.firebaseapp.com",
   projectId: "ai-short-video-generator-3632a",
   storageBucket: "ai-short-video-generator-3632a.firebasestorage.app",

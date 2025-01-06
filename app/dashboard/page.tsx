@@ -3,7 +3,7 @@ import { CirclePlus } from 'lucide-react'
 import React from 'react'
 import EmptyState from './_components/EmptyState'
 import Link from 'next/link'
-import CustomLoading from './_components/CustomLoading'
+import CustomLoading from './create-new/_components/CustomLoading'
 
 function page() {
   const videoList= []

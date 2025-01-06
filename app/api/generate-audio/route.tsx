@@ -3,14 +3,21 @@ import textToSpeech from '@google-cloud/text-to-speech';
 import fs from 'fs';
 import util from 'util';
 import { NextResponse } from 'next/server';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { storage } from '@/configs/firebase';
+
 
 const client = new textToSpeech.TextToSpeechClient({
    apiKey: process.env.GOOGLE_API_KEY
 });
 
 export async function POST(req: any) {
+
+
   try {
     const { text, id } = await req.json();
+    
+    const storageRef = ref(storage,'ai-short-video-files/'+id+'.mp3');
 
     // Validate the input text
     if (!text || typeof text !== 'string' || text.trim() === '') {
@@ -32,11 +39,24 @@ export async function POST(req: any) {
     }
 
     // Save the audio content to a file
-    const writeFile = util.promisify(fs.writeFile);
-    await writeFile(`audio${id}.mp3`, response.audioContent, 'binary');
-    console.log('Audio content written to file: output.mp3');
+    const audioBuffer =
+      typeof response.audioContent === 'string'
+        ? Buffer.from(response.audioContent, 'binary')
+        : Buffer.from(response.audioContent);
 
-    return NextResponse.json({ result: 'success' });
+    try {
+      await uploadBytes(storageRef, audioBuffer, { contentType: 'audio/mp3' });
+      console.log('Audio uploaded successfully.');
+    } catch (uploadError) {
+      console.error('Error uploading audio:', uploadError);
+      throw new Error('Failed to upload audio to Firebase Storage.');
+    }
+
+    
+    console.log('Audio content written to file: output.mp3');
+    const downloadURL = await getDownloadURL(storageRef);
+
+    return NextResponse.json({ result: downloadURL });
   } catch (error:any) {
     console.error('Error generating audio:', error);
     return NextResponse.json({ result: 'error', message: error.message }, { status: 500 });

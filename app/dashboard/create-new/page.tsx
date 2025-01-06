@@ -5,12 +5,13 @@ import SelectStyle from './_components/SelectStyle'
 import SelectDuration from './_components/SelectDuration';
 import { Button } from '@/components/ui/button';
 import axios from 'axios';
-import CustomLoading from '../_components/CustomLoading';
+import CustomLoading from './_components/CustomLoading';
 import { v4 as uuidv4 } from 'uuid';
 interface VideoSegment {
   contentText: string;
   imagePrompt: string;
 }
+
 
 function CreateNew() {
   const [loading, setLoading] = useState(false);
@@ -22,6 +23,9 @@ function CreateNew() {
   });
 
   const [videoScript, setVideoScript] = useState<VideoSegment[]>([]);
+  const [audioFileURL, setAudioFileURL] = useState<string>('');
+  const [audioCaption, setAudioCaption] = useState();
+  const [imageList, setImageList] = useState<string[]>([]);
   const handleOnInputChange = (fieldName:string, fieldVale:string) => {
     setFormData(prev=>({
       ...prev,
@@ -35,27 +39,12 @@ function CreateNew() {
     {
       "contentText": "Welcome to the exciting world of AI-generated content!",
       "imagePrompt": "A futuristic city with flying cars and vibrant neon lights"
-    },
-    {
-      "contentText": "This video will guide you through the basics of artificial intelligence and its applications.",
-      "imagePrompt": "A robot sitting at a desk, analyzing data on a screen"
-    },
-    {
-      "contentText": "AI is transforming industries, from healthcare to transportation.",
-      "imagePrompt": "A doctor using AI-powered tools to analyze patient data"
-    },
-    {
-      "contentText": "Stay tuned as we explore how you can use AI to simplify your everyday tasks.",
-      "imagePrompt": "A person using a smart home device to control appliances"
-    },
-    {
-      "contentText": "Thank you for watching! Don’t forget to like, share, and subscribe for more amazing content.",
-      "imagePrompt": "A vibrant thank-you screen with confetti and social media icons"
     }
   ]
   const onCreateClickHandler = async ()=>{
-   // getVideoScript();
-   generateAudioFile(scriptDATA)
+    getVideoScript();
+   //generateAudioFile(scriptDATA)
+   // generateImage(scriptDATA);
   }
   
 
@@ -69,30 +58,89 @@ const getVideoScript = async ()=>{
     console.log(res.data)
     const scriptData: VideoSegment[] = res.data.result.videoSegments;
     setVideoScript(scriptData); 
-    generateAudioFile(scriptData);
+    async()=>{
+      await generateAudioFile(scriptData);
+      await generateImage(scriptData);
+
+    }
+    
 
   
   }).catch(e=>console.log("error:",e));  
+
   
   setLoading(false);
+  
 }
-
+  // generate audio file
 const generateAudioFile = async (videoScript:any)=>{
+  
   let script = ''
   let id =  uuidv4();
   videoScript.forEach((item:any)=>{
     script=script+item.contentText+' '
   })
   console.log('script is:::',script)
-  axios.post('/api/generate-audio',
+  await axios.post('/api/generate-audio',
     {
       text:script,
       id:id
     }
   ).then(res=>{
-    console.log(res.data)
+    console.log('audio file:',res.data.result)
+    setAudioFileURL(res.data.result);
+    generateAudioCaption(res.data.result);
   })
+  
+  
 }
+  // generate audio caption
+const generateAudioCaption = async (audioFileURL:string)=>{
+  
+  await axios.post('/api/generate-caption',
+    {
+      audioFileURL:audioFileURL
+    }
+  ).then(res=>{
+    console.log('audio caption:',res.data.words)
+    setAudioCaption(res.data.words);
+  })
+  
+  
+}
+
+  // generate image
+  const generateImage = async (videoScript: VideoSegment[]) => {
+    
+    try {
+      // Use Promise.all to handle all async requests
+      const imagePromises = videoScript.map((item: VideoSegment) => 
+        {
+         
+          
+          return axios.post('/api/generate-image', { prompt: item.imagePrompt  })
+          .then(res => res.data.result)
+          .catch(err => {
+            console.error(`Failed to generate image for prompt: ${item.imagePrompt}`, err);
+            return null; // Handle error and continue
+          })}
+      );
+  
+      // Wait for all the image generation requests to complete
+      const images = await Promise.all(imagePromises);
+      console.log('images:',images)
+  
+      // Filter out any null results (in case of errors)
+      const validImages = images.filter(img => img !== null);
+  
+      // Update the image list
+      setImageList(validImages);
+      console.log('Generated images:', validImages);
+    } catch (error) {
+      console.error('Error generating images:', error);
+    }
+     
+  };
 
 
 

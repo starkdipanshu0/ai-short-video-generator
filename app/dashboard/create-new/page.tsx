@@ -8,6 +8,9 @@ import axios from 'axios';
 import CustomLoading from './_components/CustomLoading';
 import { v4 as uuidv4 } from 'uuid';
 import { VideoDataContext } from '@/app/_context/VideoDataContext';
+import { useUser } from '@clerk/nextjs';
+import { VideoData } from '@/configs/schema';
+import { db } from '@/configs/db';
 interface VideoSegment {
   contentText: string;
   imagePrompt: string;
@@ -15,6 +18,7 @@ interface VideoSegment {
 
 
 function CreateNew() {
+  const {user} = useUser();
   const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = React.useState({
@@ -75,7 +79,7 @@ const getVideoScript = async ()=>{
   }).catch(e=>console.log("error:",e));  
 
   
-  setLoading(false);
+  
   
 }
   // generate audio file
@@ -101,7 +105,7 @@ const generateAudioFile = async (videoScript:any)=>{
     }))
     generateAudioCaption(res.data.result);
   })
-  setLoading(false);
+  
   
 }
   // generate audio caption
@@ -120,12 +124,12 @@ const generateAudioCaption = async (audioFileURL:string)=>{
     }))
   })
   
-  setLoading(false);  
+  
 }
 
   // generate image
   const generateImage = async (videoScript: VideoSegment[]) => {
-    
+    setLoading(true);
     try {
       // Use Promise.all to handle all async requests
       const imagePromises = videoScript.map((item: VideoSegment) => 
@@ -157,13 +161,53 @@ const generateAudioCaption = async (audioFileURL:string)=>{
     } catch (error) {
       console.error('Error generating images:', error);
     }
+    setLoading(false);
      
   };
 
 
   useEffect(() => {
     console.log('videoData:',videoData)
+
+    if(Object.keys(videoData).length==4)
+        saveVideoData(videoData);
   }, [videoData]);
+
+
+  // const saveVideoData = async ()=>{
+  //   setLoading(true);
+  //   await axios.post('/api/save-video-data', {
+  //     videoData: videoData,
+  //     createdBy:user?.primaryEmailAddress?.emailAddress,
+
+  //   }).then(res=>{
+  //     console.log('video data saved:::',res.data)
+  //   }).catch(e=>console.log('error:',e))
+  //   setLoading(false);
+  // }
+
+  const saveVideoData = async (videoData:any) => {
+    try {
+      const result = await db.insert(VideoData).values({
+        script: videoData?.videoScript,
+        audioFileUrl: videoData?.audioFileUrl,
+        captions: videoData?.captions,
+        imageList: videoData?.imageList,
+        createdBy: user?.primaryEmailAddress?.emailAddress,
+        createdAt: new Date()
+      }).returning({id:VideoData.id})
+  
+      console.log('video data saved:',result)
+      
+    } catch (error) {
+      console.error('Error saving video data:', error);
+      
+    }
+
+     
+    setLoading(false);
+
+  }
 
 
 
@@ -187,8 +231,6 @@ const generateAudioCaption = async (audioFileURL:string)=>{
             </Button>
         </div>
         <CustomLoading loading={loading}/>
-
-
 
     </div>
   )

@@ -3,6 +3,28 @@ import Replicate from "replicate";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "@/configs/firebase";
 
+async function fetchWithRetry(url: string, retries: number = 3, delay: number = 2000) {
+    let attempt = 0;
+    while (attempt < retries) {
+        try {
+            const response = await fetch(url);
+            if (response.ok) {
+                return response;
+            } else {
+                throw new Error(`Failed to fetch image. Status: ${response.status}`);
+            }
+        } catch (error) {
+            attempt++;
+            if (attempt < retries) {
+                console.log(`Retrying... Attempt ${attempt}`);
+                await new Promise(res => setTimeout(res, delay)); // Wait before retrying
+            } else {
+                throw new Error('Max retries reached. ' + error);
+            }
+        }
+    }
+}
+
 export async function POST(req: Request) {
   try {
     // Parse the request body
@@ -14,8 +36,6 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-
-    
 
     // Initialize Replicate client
     const replicate = new Replicate({
@@ -45,15 +65,15 @@ export async function POST(req: Request) {
     // Handle image upload to Firebase Storage
     const imageUrl = output[0]; // Assuming the first output contains the image URL
     console.log("Generated image URL:", imageUrl);
-    const response = await fetch(imageUrl);
-    if (!response.ok) {
+
+    const response = await fetchWithRetry(imageUrl); // Using retry logic
+    if(!response){
       return NextResponse.json(
-        { error: "Failed to fetch the generated image." },
+        { error: "Failed to fetch image from the URL." },
         { status: 500 }
       );
     }
-
-    const imageBlob = await response.blob(); // Convert the response to a Blob
+     const imageBlob = await response.blob(); // Convert the response to a Blob
     const storageRef = ref(storage, `ai-short-video-files/${Date.now()}.png`);
 
     // Upload the image to Firebase Storage

@@ -10,13 +10,14 @@ export const Users = pgTable('users', {
   subscription: boolean('subscription').default(false),
 });
 
-export const VideoData = pgTable('videoData', {
-  id: serial('id').primaryKey().notNull(), // Auto-incrementing primary key
-  script: json('script').notNull(), // Using JSONB for better query performance
-  audioFileUrl: text('audioFileUrl').notNull(), // Text to handle longer URLs
-  captions: json('captions').notNull(), // JSONB for captions to improve indexing
-  imageList: text('imageList').array().notNull(), // Array of text for storing image URLs
-  createdBy: varchar('createdBy', { length: 255 }).notNull(), // Creator ID or username
-  createdAt: timestamp('createdAt').defaultNow().notNull(), // Automatically sets the current timestamp
-  updatedAt: timestamp('updatedAt').defaultNow().notNull(), // Automatically updates on modifications
+
+
+export const VideoData = pgTable("videoData", {
+  id: serial("id").primaryKey().notNull(), // Auto-incrementing primary key
+  script: json("script").notNull(), // JSON column for script data
+  audioFileUrl: varchar("audioFileUrl", { length: 511 }).notNull(), // Text column for audio file URLs
+  captions: json("captions").notNull(), // JSON column for captions
+  imageList: varchar("imageList", { length: 511 }).array(1), // Array of text for storing image URLs
+  createdBy: varchar("createdBy", { length: 511 }).notNull(), // Creator's ID or username
+  createdAt: timestamp("createdAt"), // Timestamp for creation time
 });

@@ -36,7 +36,7 @@ function SideNav() {
   const currentPath = usePathname();
 
   return (
-    <aside className="w-64 h-screen p-6 bg-white shadow-md">
+    <aside className="w-64 h-screen p-6 bg-white shadow-md pt-10">
       <div className="flex flex-col gap-4">
         {menuOptions.map((item) => (
           <Link href={item.path} key={item.id}>

@@ -16,7 +16,7 @@ function DashBoardLayout({
     <VideoDataContext.Provider value={{videoData, setVideoData}}>
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="hidden md:block  h-screen bg-white fixed w-64 shadow-lg">
+      <div className="hidden md:block  h-screen bg-white fixed w-64 shadow-lg ">
         <SideNav />
       </div>
 

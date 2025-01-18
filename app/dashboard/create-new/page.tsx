@@ -11,6 +11,7 @@ import { VideoDataContext } from '@/app/_context/VideoDataContext';
 import { useUser } from '@clerk/nextjs';
 import { VideoData } from '@/configs/schema';
 import { db } from '@/configs/db';
+import PlayerDialog from '../_components/PlayerDialog';
 interface VideoSegment {
   contentText: string;
   imagePrompt: string;
@@ -18,6 +19,10 @@ interface VideoSegment {
 
 
 function CreateNew() {
+  const [playVideo, setPlayVideo] = useState<boolean>(false);
+  const [videoId, setVideoId] = useState<number>();
+
+
   const {user} = useUser();
   const [loading, setLoading] = useState(false);
   
@@ -188,6 +193,7 @@ const generateAudioCaption = async (audioFileURL:string)=>{
 
   const saveVideoData = async (videoData:any) => {
     try {
+      // @ts-ignore
       const result = await db.insert(VideoData).values({
         script: videoData?.videoScript,
         audioFileUrl: videoData?.audioFileUrl,
@@ -196,6 +202,9 @@ const generateAudioCaption = async (audioFileURL:string)=>{
         createdBy: user?.primaryEmailAddress?.emailAddress,
         createdAt: new Date()
       }).returning({id:VideoData.id})
+
+      setVideoId(result[0].id);
+      setPlayVideo(true);
   
       console.log('video data saved:',result)
       
@@ -231,6 +240,7 @@ const generateAudioCaption = async (audioFileURL:string)=>{
             </Button>
         </div>
         <CustomLoading loading={loading}/>
+        <PlayerDialog playVideo={playVideo} videoId={videoId!} />
 
     </div>
   )

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AbsoluteFill, Sequence, Img, useVideoConfig, Audio, useCurrentFrame, interpolate } from 'remotion';
-
+import usePreloadImages from './usePreloadImages';
 // Define the prop types
 interface Caption {
     text: string;
@@ -26,6 +26,14 @@ interface RemotionVideoProps {
 function RemotionVideo({ script, audioFileUrl, imageList, captions, setDurationInFrames }: RemotionVideoProps) {
     const { fps } = useVideoConfig();
     const frame = useCurrentFrame();
+    const { cachedImages, imagesLoaded } = usePreloadImages(imageList); // Use the optimized preload hook
+
+    if (!imagesLoaded) {
+        return <AbsoluteFill style={{ backgroundColor: "black", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <h2 className="text-white text-2xl">Loading Images...</h2>
+        </AbsoluteFill>;
+    }
+
 
 
     // Function to calculate the total duration in frames
@@ -69,7 +77,7 @@ function RemotionVideo({ script, audioFileUrl, imageList, captions, setDurationI
                     <AbsoluteFill style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 
                         {/* Render the image */}
-                        <Img src={item} style={{
+                        <Img src={cachedImages[item]?.src || item} style={{
                             width: '100%',
                             height: '100%',
                             objectFit: 'cover',

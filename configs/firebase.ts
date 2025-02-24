@@ -1,5 +1,6 @@
 
 // Import the functions you need from the SDKs you need
+import { getAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 
 import { getStorage } from "firebase/storage";
@@ -10,15 +11,14 @@ import { getStorage } from "firebase/storage";
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: "ai-short-video-generator-3632a.firebaseapp.com",
-  projectId: "ai-short-video-generator-3632a",
-  storageBucket: "ai-short-video-generator-3632a.firebasestorage.app",
-  messagingSenderId: "279695935788",
-  appId: "1:279695935788:web:61975eb8ea5f0149f5c489",
-  measurementId: "G-950VBTJMQ0"
+  authDomain: "ai-short-video-generator-89eee.firebaseapp.com",
+  projectId: "ai-short-video-generator-89eee",
+  storageBucket: "ai-short-video-generator-89eee.firebasestorage.app",
+  messagingSenderId: "394341296022",
+  appId: "1:394341296022:web:e9c078b84146d80dd5dfb7"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
+export const auth = getAuth(app);
 export const  storage = getStorage(app);

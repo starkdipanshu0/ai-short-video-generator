@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 const usePreloadImages = (imageList: string[]) => {
     const [cachedImages, setCachedImages] = useState<{ [key: string]: HTMLImageElement }>({});
     const [imagesLoaded, setImagesLoaded] = useState(false);
+  
 
     useEffect(() => {
         const preloadImages = async () => {
@@ -12,7 +13,10 @@ const usePreloadImages = (imageList: string[]) => {
                 await Promise.all(
                     imageList.map((src) =>
                         new Promise<void>((resolve, reject) => {
+                            
                             const img = new Image();
+
+                            
                             img.src = src;
 
                             img.onload = async () => {
@@ -43,6 +47,8 @@ const usePreloadImages = (imageList: string[]) => {
                         })
                     )
                 );
+
+                
 
                 setCachedImages(cache);
                 setImagesLoaded(true);

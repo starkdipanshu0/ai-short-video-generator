@@ -30,7 +30,7 @@ function RemotionVideo({ script, audioFileUrl, imageList, captions, setDurationI
 
     if (!imagesLoaded) {
         return <AbsoluteFill style={{ backgroundColor: "black", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <h2 className="text-white text-2xl">Loading Images...</h2>
+            <h2 className="text-white text-2xl">Your video is ready</h2>
         </AbsoluteFill>;
     }
 

@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { db } from "@/configs/db";
 import { VideoData } from "@/configs/schema";
 import { eq } from "drizzle-orm";
-
+import Router, { useRouter } from "next/navigation";
 interface Caption {
   text: string;
   start: number;
@@ -45,6 +45,7 @@ function PlayerDialog({ playVideo, videoId }: PlayerDialogProps) {
   const [videoData, setVideoData] = useState<VideoDataType | null>(null);
   const [openDialog, setOpenDialog] = useState(playVideo);
   const [durationInFrames, setDurationInFrames] = useState(1);
+  const router = useRouter()
   useEffect(() => {
     setOpenDialog(playVideo);
     if (videoId) {
@@ -88,7 +89,7 @@ function PlayerDialog({ playVideo, videoId }: PlayerDialogProps) {
           )}
         </DialogHeader>
         <div className="flex justify-between w-full mt-5 px-7">
-          <Button variant="ghost" className="py-3" onClick={() => setOpenDialog(false)}>
+          <Button variant="ghost" className="py-3" onClick={() => {router.replace('/dashboard');setOpenDialog(false)}}>
             Close
           </Button>
           <Button className="py-3">Export</Button>

@@ -89,7 +89,7 @@ function PlayerDialog({ playVideo, videoId }: PlayerDialogProps) {
           )}
         </DialogHeader>
         <div className="flex justify-between w-full mt-5 px-7">
-          <Button variant="ghost" className="py-3" onClick={() => {router.replace('/dashboard');setOpenDialog(false)}}>
+          <Button variant="ghost" className="py-3" onClick={() => {setOpenDialog(false);router.replace('/dashboard');}}>
             Close
           </Button>
           <Button className="py-3">Export</Button>

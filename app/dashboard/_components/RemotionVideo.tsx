@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AbsoluteFill, Sequence, Img, useVideoConfig, Audio, useCurrentFrame, interpolate } from 'remotion';
 import usePreloadImages from './usePreloadImages';
+
 // Define the prop types
 interface Caption {
     text: string;
@@ -56,7 +57,7 @@ function RemotionVideo({ script, audioFileUrl, imageList, captions, setDurationI
 
     return (
         <AbsoluteFill style={{ backgroundColor: 'black' }}>
-            {imageList.map((item, index) => {
+            {Array.isArray(imageList)&&imageList.map((item: string, index:any) => {
                 const startTime =index * perImageDuration;
                 const duration = getDurationFrames();
                 

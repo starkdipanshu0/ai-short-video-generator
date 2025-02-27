@@ -10,6 +10,7 @@ import { VideoData } from '@/configs/schema'
 import { eq } from 'drizzle-orm'
 import { useUser } from '@clerk/nextjs'
 import VideoList from './_components/VideoList'
+import axios from 'axios'
 
 
 
@@ -24,19 +25,20 @@ function page() {
   , [user])
   
 
-  const getVideoList = async()=>{
-    try {
-      const result = await db
-    .select()
-    .from(VideoData)
-    //@ts-ignore
-    .where(eq(VideoData.createdBy, user?.primaryEmailAddress?.emailAddress));
-    //console.log(result);
-    setVideoList(result);
-    } catch (error) {
-      console.error("Error fetching video list:", error);
-      
-    }
+  const getVideoList = async ()=>{
+    
+    const result = await axios.get('/api/get-video-list').then(res=>{
+      console.log(res.data);
+      const data = res.data;
+      setVideoList(data);
+   
+    }).catch((e)=>{
+      console.log("error:",e);
+      alert("video loading is failed");
+    });  
+  
+    
+    
     
   }
 

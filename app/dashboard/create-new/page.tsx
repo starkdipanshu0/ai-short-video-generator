@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { VideoDataContext } from '@/app/_context/VideoDataContext';
 import { useUser } from '@clerk/nextjs';
 import { VideoData } from '@/configs/schema';
-import { db } from '@/configs/db';
+
 import PlayerDialog from '../_components/PlayerDialog';
 interface VideoSegment {
   contentText: string;
@@ -33,10 +33,7 @@ function CreateNew() {
   });
  // const {videoData, setVideoData} = React.useContext(VideoDataContext);
  const [videoData , setVideoData] = React.useState([]);
-  const [videoScript, setVideoScript] = useState<VideoSegment[]>([]);
-  const [audioFileURL, setAudioFileURL] = useState<string>('');
-  const [audioCaption, setAudioCaption] = useState();
-  const [imageList, setImageList] = useState<string[]>([]);
+
   const handleOnInputChange = (fieldName:string, fieldVale:string) => {
     setFormData(prev=>({
       ...prev,
@@ -46,17 +43,11 @@ function CreateNew() {
     )
   }
 
-  const scriptDATA=[
-    {
-      "contentText": "Welcome to the exciting world of AI-generated content!",
-      "imagePrompt": "A futuristic city with flying cars and vibrant neon lights"
-    }
-  ]
+
   const onCreateClickHandler = async ()=>{
     setIsVideoDataSaved(false);
     getVideoScript();
-   //generateAudioFile(scriptDATA)
-   // generateImage(scriptDATA);
+
   }
   
 
@@ -69,7 +60,7 @@ const getVideoScript = async ()=>{
   }).then(res=>{
     console.log(res.data)
     const scriptData: VideoSegment[] = res.data.result.videoSegments;
-    setVideoScript(scriptData); 
+  
     setVideoData((prev:any)=>({
       ...prev,
       'videoScript': scriptData
@@ -82,7 +73,11 @@ const getVideoScript = async ()=>{
     
 
   
-  }).catch(e=>console.log("error:",e));  
+  }).catch((e)=>{
+    console.log("error:",e);
+    alert("video generation is failed");
+    setLoading(false);
+  });  
 
   
   
@@ -104,12 +99,15 @@ const generateAudioFile = async (videoScript:any)=>{
     }
   ).then(res=>{
     console.log('audio file:',res.data.result)
-    setAudioFileURL(res.data.result);
     setVideoData((prev:any)=>({
       ...prev,
       'audioFileUrl': res.data.result
     }))
     generateAudioCaption(res.data.result);
+  }).catch((e)=>{
+    console.log("error :",e);
+    alert("video generation is failed");
+    setLoading(false);
   })
   
   
@@ -123,11 +121,15 @@ const generateAudioCaption = async (audioFileURL:string)=>{
     }
   ).then(res=>{
     console.log('audio caption:',res.data.words)
-    setAudioCaption(res.data.words);
+
     setVideoData((prev:any)=>({
       ...prev,
       'captions': res.data.words
     }))
+  }).catch((e)=>{
+    console.log("error :",e);
+    alert("video generation is failed");
+    setLoading(false);
   })
   
   
@@ -158,7 +160,7 @@ const generateAudioCaption = async (audioFileURL:string)=>{
       const validImages = images.filter(img => img !== null);
   
       // Update the image list
-      setImageList(validImages);
+      
       setVideoData((prev:any)=>({
         ...prev,
         'imageList': validImages
@@ -166,8 +168,9 @@ const generateAudioCaption = async (audioFileURL:string)=>{
       console.log('Generated images:', validImages);
     } catch (error) {
       console.error('Error generating images:', error);
+   
     }
-    setLoading(false);
+   
      
   };
 
@@ -178,48 +181,25 @@ const generateAudioCaption = async (audioFileURL:string)=>{
     if(Object.keys(videoData).length==4&&!isVideoDataSaved){
         saveVideoData(videoData);
         setIsVideoDataSaved(true);
+        setLoading(false);
         
     }  
   }, [videoData]);
 
 
-  // const saveVideoData = async ()=>{
-  //   setLoading(true);
-  //   await axios.post('/api/save-video-data', {
-  //     videoData: videoData,
-  //     createdBy:user?.primaryEmailAddress?.emailAddress,
-
-  //   }).then(res=>{
-  //     console.log('video data saved:::',res.data)
-  //   }).catch(e=>console.log('error:',e))
-  //   setLoading(false);
-  // }
-
-  const saveVideoData = async (videoData:any) => {
-    try {
-      // @ts-ignore
-      const result = await db.insert(VideoData).values({
-        script: videoData?.videoScript,
-        audioFileUrl: videoData?.audioFileUrl,
-        captions: videoData?.captions,
-        imageList: videoData?.imageList,
-        createdBy: user?.primaryEmailAddress?.emailAddress,
-        createdAt: new Date()
-      }).returning({id:VideoData.id})
-
-      setVideoId(result[0].id);
-      setPlayVideo(true);
+  const saveVideoData = async (videoData: any )=>{
   
-      console.log('video data saved:',result)
-      
-    } catch (error) {
-      console.error('Error saving video data:', error);
-      
-    }
+    await axios.post('/api/save-video-data', {
+      videoData: videoData,
+      createdBy:user?.primaryEmailAddress?.emailAddress,
 
-     
-    setLoading(false);
-
+    }).then(res=>{
+      console.log('video data saved:::',res.data)
+    }).catch((e)=>{
+      console.log("error :",e);
+      alert("video data failed to save");
+      setLoading(false);
+    })
   }
   const handleDialogClose = () => {
     setPlayVideo(false);

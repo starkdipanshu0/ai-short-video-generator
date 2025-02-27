@@ -25,7 +25,7 @@ export const POST = async (req: Request) => {
             audioFileUrl: videoData.audioFileUrl,
             captions: videoData.captions,
             imageList: videoData.imageList,
-            createdBy,
+            createdBy: createdBy,
             createdAt: new Date(),
         });
 

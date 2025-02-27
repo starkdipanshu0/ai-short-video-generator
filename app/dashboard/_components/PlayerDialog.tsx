@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { db } from "@/configs/db";
 import { VideoData } from "@/configs/schema";
 import { eq } from "drizzle-orm";
-import Router, { useRouter } from "next/navigation";
+import  { useRouter } from "next/navigation";
 interface Caption {
   text: string;
   start: number;
@@ -28,6 +28,7 @@ interface Caption {
 type PlayerDialogProps = {
   playVideo: boolean;
   videoId: number;
+  onClose: () => void;
 };
 interface ScriptItem {
     imagePrompt: string;
@@ -41,7 +42,8 @@ type VideoDataType = {
   captions: Caption[];
 };
 
-function PlayerDialog({ playVideo, videoId }: PlayerDialogProps) {
+function PlayerDialog({ playVideo, videoId, onClose }: PlayerDialogProps) {
+  const [opened, setOpened] = useState(false)
   const [videoData, setVideoData] = useState<VideoDataType | null>(null);
   const [openDialog, setOpenDialog] = useState(playVideo);
   const [durationInFrames, setDurationInFrames] = useState(1);
@@ -58,6 +60,7 @@ function PlayerDialog({ playVideo, videoId }: PlayerDialogProps) {
       const result = await db.select().from(VideoData).where(eq(VideoData.id, videoId));
       if (result.length > 0) {
         setVideoData(result[0]as VideoDataType);
+        setOpened(true);
       } else {
         console.error("No video data found for the given ID");
       }
@@ -65,6 +68,8 @@ function PlayerDialog({ playVideo, videoId }: PlayerDialogProps) {
       console.error("Error fetching videaq  o data:", error);
     }
   };
+
+  
 
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
@@ -89,7 +94,7 @@ function PlayerDialog({ playVideo, videoId }: PlayerDialogProps) {
           )}
         </DialogHeader>
         <div className="flex justify-between w-full mt-5 px-7">
-          <Button variant="ghost" className="py-3" onClick={() => {setOpenDialog(false);router.replace('/dashboard');}}>
+          <Button variant="ghost" className="py-3" onClick={() => {onClose();setOpenDialog(false);router.replace('/dashboard');}}>
             Close
           </Button>
           <Button className="py-3">Export</Button>

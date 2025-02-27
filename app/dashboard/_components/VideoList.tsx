@@ -21,6 +21,7 @@ function VideoList({videoList}:any) {
             return () => clearTimeout(timer);
         }
     }, [visibleThumbnails, videoList.length]);
+  const faltu=()=>{} 
 
   return (
     <div className='mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4'>
@@ -41,13 +42,13 @@ function VideoList({videoList}:any) {
                 fps={30}
                 inputProps={{
                   ...video,
-                  setDurationInFrames:()=>console.log("here from thambnail")
+                  setDurationInFrames:()=>{}
                 }}
             />
           </div>
       ))}
       
-      <PlayerDialog playVideo={openPlayerDialog} videoId={videoId??0}/>
+      <PlayerDialog playVideo={openPlayerDialog} videoId={videoId??0} onClose={faltu}/>
 
     </div>
   )

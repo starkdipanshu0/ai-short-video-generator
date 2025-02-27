@@ -20,8 +20,8 @@ interface VideoSegment {
 
 function CreateNew() {
   const [playVideo, setPlayVideo] = useState<boolean>(false);
-  const [videoId, setVideoId] = useState<number>();
-
+  const [videoId, setVideoId] = useState<number|null>();
+  const [isVideoDataSaved, setIsVideoDataSaved]= useState(false);
 
   const {user} = useUser();
   const [loading, setLoading] = useState(false);
@@ -31,8 +31,8 @@ function CreateNew() {
     style: '',
     duration: ''
   });
-  const {videoData, setVideoData} = React.useContext(VideoDataContext);
-
+ // const {videoData, setVideoData} = React.useContext(VideoDataContext);
+ const [videoData , setVideoData] = React.useState([]);
   const [videoScript, setVideoScript] = useState<VideoSegment[]>([]);
   const [audioFileURL, setAudioFileURL] = useState<string>('');
   const [audioCaption, setAudioCaption] = useState();
@@ -53,6 +53,7 @@ function CreateNew() {
     }
   ]
   const onCreateClickHandler = async ()=>{
+    setIsVideoDataSaved(false);
     getVideoScript();
    //generateAudioFile(scriptDATA)
    // generateImage(scriptDATA);
@@ -174,8 +175,11 @@ const generateAudioCaption = async (audioFileURL:string)=>{
   useEffect(() => {
     console.log('videoData:',videoData)
 
-    if(Object.keys(videoData).length==4)
+    if(Object.keys(videoData).length==4&&!isVideoDataSaved){
         saveVideoData(videoData);
+        setIsVideoDataSaved(true);
+        
+    }  
   }, [videoData]);
 
 
@@ -217,6 +221,11 @@ const generateAudioCaption = async (audioFileURL:string)=>{
     setLoading(false);
 
   }
+  const handleDialogClose = () => {
+    setPlayVideo(false);
+    setVideoId(null);
+     // Reset videoId
+  };
 
 
 
@@ -240,7 +249,8 @@ const generateAudioCaption = async (audioFileURL:string)=>{
             </Button>
         </div>
         <CustomLoading loading={loading}/>
-        <PlayerDialog playVideo={playVideo} videoId={videoId!} />
+
+        <PlayerDialog playVideo={playVideo} videoId={videoId!} onClose={handleDialogClose}/>
 
     </div>
   )

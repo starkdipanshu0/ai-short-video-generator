@@ -57,7 +57,7 @@ function RemotionVideo({ script, audioFileUrl, imageList, captions, setDurationI
 
     return (
         <AbsoluteFill style={{ backgroundColor: 'black' }}>
-            {Array.isArray(imageList)&&imageList.map((item: string, index:any) => {
+            {imageList.map((item: string, index:any) => {
                 const startTime =index * perImageDuration;
                 const duration = getDurationFrames();
                 

@@ -211,9 +211,9 @@ const generateAudioCaption = async (audioFileURL:string)=>{
 
 
   return (
-    <div className='md:px-20'>
+    <div className='pb-40 md:px-20'>
         <h2 className='font-bold text-center text-primary text-2xl p-3'>Create New</h2>
-        <div className='mt-10 p-10 shadow-md rounded-md'>
+        <div className='mt-10 sm:p-10 shadow-md rounded-md'>
             {/* select topic component */}
             <SelectTopic onUserSelect={handleOnInputChange}/>
             {/* select Style */}
@@ -229,7 +229,7 @@ const generateAudioCaption = async (audioFileURL:string)=>{
             </Button>
         </div>
         <CustomLoading loading={loading}/>
-
+      
         <PlayerDialog playVideo={playVideo} videoId={videoId!} onClose={handleDialogClose}/>
 
     </div>

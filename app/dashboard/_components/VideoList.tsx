@@ -24,11 +24,11 @@ function VideoList({videoList}:any) {
   const faltu=()=>{} 
 
   return (
-    <div className='mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4'>
+    <div className='mt-10 flex flex-wrap  gap-6 px-1 justify-center'>
       {videoList.toReversed().slice(0, visibleThumbnails).map((video:any, index:any)=>(
           <div 
           key={index}
-          className='bg-white shadow-lg rounded-2xl overflow-hidden transform transition duration-300 hover:scale-105'
+          className='bg-white shadow-xl rounded-3xl overflow-hidden transform transition-all duration-300 ease-out hover:scale-105 hover:shadow-2xl min-w-60 p-4'
             onClick={()=>{
               setOpenPlayerDialog(true);
               setVideoId(video.id)

@@ -25,7 +25,7 @@ function Header() {
           {/* Title */}
           <div>
             <h1 className="text-xl md:text-3xl font-extrabold text-orange-600 drop-shadow-md">
-              ClipMania
+              Clipverse
             </h1>
             <p className="text-xs md:text-sm text-gray-500 font-medium">
               AI-Powered Video Generator

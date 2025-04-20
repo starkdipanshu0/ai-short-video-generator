@@ -41,7 +41,7 @@ export default function LandingPage() {
           {/* Title */}
           <div>
             <h1 className="text-4xl font-extrabold text-orange-600 drop-shadow-md">
-              ClipMania
+              Clipverse
             </h1>
             <p className="text-sm text-gray-500 font-medium">
               AI-Powered Short Video Generator

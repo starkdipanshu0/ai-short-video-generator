@@ -23,8 +23,8 @@ export async function GET(req: NextRequest) {
     // Fetch videos where `createdBy` matches the user's email
     const result = await db
       .select()
-      .from(VideoData)
-      .where(eq(VideoData.createdBy, userEmail));
+      .from(VideoData);
+      //.where(eq(VideoData.createdBy, userEmail));
 
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
